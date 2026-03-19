@@ -70,13 +70,13 @@ echo "# Side Projects Notes" > ~/Documents/obsidian-vault/side-projects/README.m
 
 ## Step 5: Register MCP Server in Claude Code
 
-**Option A: Single vault, no project scoping (simplest)**
+**Always do this first** - adds vault access to all projects via user config:
 
 ```bash
 claude mcp add obsidian-vault --scope user -- mcpvault ~/Documents/obsidian-vault
 ```
 
-**Option B: Project-scoped (recommended for multiple projects)**
+**Optional: Add project scoping on top (recommended for multiple projects)**
 
 For each project directory the user works in, add a project-scoped MCP server.
 
@@ -116,17 +116,9 @@ with open(claude_json_path, 'w') as f:
 print("MCP servers configured for:", list(project_map.values()))
 ```
 
-**Option C: User-level fallback + project scoping (best of both)**
-
-Do Option B for specific projects, then add a user-level fallback for everything else:
-
-```bash
-claude mcp add obsidian-vault --scope user -- mcpvault ~/Documents/obsidian-vault
-```
-
-This way:
-- Listed projects get their scoped vault folder
-- All other projects get full vault access
+When both are set:
+- Projects with scoping get their restricted vault folder
+- All other projects get full vault access via user config
 
 ## Step 6: Verify Setup
 
