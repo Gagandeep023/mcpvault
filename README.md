@@ -64,7 +64,16 @@ claude mcp add obsidian npx @gagandeep023/mcpvault /path/to/your/vault
 npx @gagandeep023/mcpvault@latest /path/to/your/vault
 ```
 
+**Global install:**
+```bash
+npm install -g @gagandeep023/mcpvault
+mcpvault /path/to/your/vault
+mcpvault --project my-project /path/to/your/vault
+```
+
 Replace `/path/to/your/vault` with your actual vault path.
+
+> **Note:** You don't need to start the server manually. Claude Code launches it automatically as a background process when you open a session. Manual execution is only needed for testing or debugging.
 
 ## Project Scoping
 
