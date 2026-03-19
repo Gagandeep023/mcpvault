@@ -13,18 +13,40 @@ A lightweight MCP (Model Context Protocol) server for connecting AI assistants t
 - Zero Obsidian plugins required, works directly with vault files
 - Path traversal protection and security boundaries
 
-## Quick Start
+## Setup
 
-### With Claude Code
+### 1. Install Obsidian
 
+Download and install [Obsidian](https://obsidian.md) (free):
+
+**macOS:**
+```bash
+brew install --cask obsidian
+```
+
+**Windows:**
+Download from [obsidian.md/download](https://obsidian.md/download) and run the installer.
+
+**Linux:**
+```bash
+# Snap
+sudo snap install obsidian --classic
+
+# Or download the AppImage from obsidian.md/download
+```
+
+### 2. Create a Vault
+
+Open Obsidian and create a new vault. Note the vault path (e.g. `~/Documents/my-vault`).
+
+### 3. Connect to Your AI Client
+
+**Claude Code:**
 ```bash
 claude mcp add obsidian npx @gagandeep023/mcpvault /path/to/your/vault
 ```
 
-### With Claude Desktop
-
-Add to `claude_desktop_config.json`:
-
+**Claude Desktop** - add to `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
@@ -36,11 +58,12 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
-### Run Directly
-
+**Run directly:**
 ```bash
 npx @gagandeep023/mcpvault@latest /path/to/your/vault
 ```
+
+Replace `/path/to/your/vault` with your actual vault path.
 
 ## API Methods
 
