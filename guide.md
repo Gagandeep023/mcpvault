@@ -34,15 +34,16 @@ sudo snap install obsidian --classic
 
 For Windows, download from https://obsidian.md/download
 
-## Step 2: Clone and Build MCPVault
+## Step 2: Install MCPVault
 
 ```bash
-cd ~/Documents
-git clone https://github.com/Gagandeep023/mcpvault.git
-cd mcpvault
-npm install
-npm run build
-npm test  # Verify all 156 tests pass
+npm install -g @gagandeep023/mcpvault
+```
+
+Verify it works:
+
+```bash
+mcpvault --version
 ```
 
 ## Step 3: Create the Obsidian Vault
@@ -72,7 +73,7 @@ echo "# Side Projects Notes" > ~/Documents/obsidian-vault/side-projects/README.m
 **Option A: Single vault, no project scoping (simplest)**
 
 ```bash
-claude mcp add obsidian-vault --scope user -- node ~/Documents/mcpvault/dist/server.js ~/Documents/obsidian-vault
+claude mcp add obsidian-vault --scope user -- mcpvault ~/Documents/obsidian-vault
 ```
 
 **Option B: Project-scoped (recommended for multiple projects)**
@@ -91,7 +92,6 @@ with open(claude_json_path, 'r') as f:
     config = json.load(f)
 
 vault = os.path.expanduser("~/Documents/obsidian-vault")
-server = os.path.expanduser("~/Documents/mcpvault/dist/server.js")
 
 # CUSTOMIZE THIS: map each project directory to a vault subfolder
 # Key = absolute path to the project directory
@@ -105,8 +105,8 @@ for project_path, vault_folder in project_map.items():
     if project_path in config.get("projects", {}):
         config["projects"][project_path]["mcpServers"] = {
             "obsidian-vault": {
-                "command": "node",
-                "args": [server, "--project", vault_folder, vault]
+                "command": "mcpvault",
+                "args": ["--project", vault_folder, vault]
             }
         }
 
@@ -121,7 +121,7 @@ print("MCP servers configured for:", list(project_map.values()))
 Do Option B for specific projects, then add a user-level fallback for everything else:
 
 ```bash
-claude mcp add obsidian-vault --scope user -- node ~/Documents/mcpvault/dist/server.js ~/Documents/obsidian-vault
+claude mcp add obsidian-vault --scope user -- mcpvault ~/Documents/obsidian-vault
 ```
 
 This way:

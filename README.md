@@ -154,10 +154,11 @@ npm run build                                    # Build for distribution
 Want a Claude agent to set up everything for you? Paste this prompt into Claude Code:
 
 ```
-Run this to get the setup guide, then follow it step by step to set up the
-Obsidian vault and MCP server for my projects:
+Install @gagandeep023/mcpvault globally, then read the guide and follow it
+step by step to set up the Obsidian vault and MCP server for my projects:
 
-npm pack @gagandeep023/mcpvault && tar -xzf gagandeep023-mcpvault-*.tgz && cat package/guide.md && rm -rf package gagandeep023-mcpvault-*.tgz
+npm install -g @gagandeep023/mcpvault
+cat $(npm root -g)/@gagandeep023/mcpvault/guide.md
 ```
 
 The guide covers: installing Obsidian, creating the vault, project-scoped folders, registering the MCP server in Claude Code, and verification steps.
