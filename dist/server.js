@@ -7,6 +7,7 @@ import { FrontmatterHandler, parseFrontmatter } from "./src/frontmatter.js";
 import { PathFilter } from "./src/pathfilter.js";
 import { SearchService } from "./src/search.js";
 import { readFileSync } from "fs";
+import { readdir } from "node:fs/promises";
 import { fileURLToPath } from "url";
 import { dirname, join, resolve } from "path";
 // Get package.json version
@@ -25,32 +26,45 @@ if (firstArg === "--help" || firstArg === "-h") {
     console.log(`
 mcpvault v${VERSION}
 
-Universal AI bridge for Obsidian vaults - connect any MCP-compatible assistant
+AI bridge for Obsidian vaults - connect any MCP-compatible assistant
 
 Usage:
-  npx @bitbonsai/mcpvault [vault-path]
+  npx @gagandeep023/mcpvault [options] [vault-path]
 
 Arguments:
-  [vault-path]    Optional path to your Obsidian vault directory
-                  Defaults to current working directory when omitted
+  [vault-path]              Path to your Obsidian vault directory
+                            Defaults to current working directory when omitted
 
 Options:
-  --version, -v   Show version number
-  --help, -h      Show this help message
+  --project <name>          Scope all operations to a project subfolder within the vault.
+                            Only notes inside vault/<name>/ will be accessible.
+  --version, -v             Show version number
+  --help, -h                Show this help message
 
 Examples:
-  npx @bitbonsai/mcpvault
-  npx @bitbonsai/mcpvault ~/Documents/MyVault
-  npx @bitbonsai/mcpvault ./Vault
-  npx @bitbonsai/mcpvault /path/to/obsidian/vault
-  npx @bitbonsai/mcpvault "/path/with spaces/Obsidian Vault"
+  npx @gagandeep023/mcpvault ~/Documents/my-vault
+  npx @gagandeep023/mcpvault --project pulse-central ~/Documents/my-vault
+  npx @gagandeep023/mcpvault --project coffee-project ./Vault
 `);
     process.exit(0);
 }
-// Join trailing args to support vault paths with spaces.
-// When omitted, default to current working directory.
-const vaultPathArg = cliArgs.join(' ').trim();
-const vaultPath = resolve(vaultPathArg || process.cwd());
+// Parse --project flag and vault path from CLI args
+let projectName = null;
+const filteredArgs = [];
+for (let i = 0; i < cliArgs.length; i++) {
+    const arg = cliArgs[i];
+    if (arg === '--project' && i + 1 < cliArgs.length) {
+        projectName = cliArgs[i + 1];
+        i++; // skip the value
+    }
+    else {
+        filteredArgs.push(arg);
+    }
+}
+const vaultPathArg = filteredArgs.join(' ').trim();
+const vaultRoot = resolve(vaultPathArg || process.cwd());
+// When --project is set, scope to that subfolder. Otherwise use full vault.
+const vaultPath = projectName ? resolve(join(vaultRoot, projectName)) : vaultRoot;
 // Initialize services
 const pathFilter = new PathFilter();
 const frontmatterHandler = new FrontmatterHandler();
@@ -406,6 +420,28 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         }
                     }
                 }
+            },
+            {
+                name: "list_projects",
+                description: "List available project folders in the vault root. Each project is a top-level directory that can be used with --project flag to scope operations.",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        prettyPrint: {
+                            type: "boolean",
+                            description: "Format JSON response with indentation (default: false)",
+                            default: false
+                        }
+                    }
+                }
+            },
+            {
+                name: "get_current_project",
+                description: "Show which project is currently active and the effective vault path being used.",
+                inputSchema: {
+                    type: "object",
+                    properties: {}
+                }
             }
         ]
     };
@@ -666,6 +702,51 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                                 size: stats.totalSize,
                                 recent: stats.recentlyModified
                             }, null, indent)
+                        }
+                    ]
+                };
+            }
+            case "list_projects": {
+                // Always list from vault root, not scoped path
+                const entries = await readdir(vaultRoot, { withFileTypes: true });
+                const projects = [];
+                for (const entry of entries) {
+                    if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules') {
+                        // Count .md files in the project folder
+                        let noteCount = 0;
+                        try {
+                            const files = await readdir(join(vaultRoot, entry.name), { recursive: true });
+                            noteCount = files.filter((f) => String(f).endsWith('.md')).length;
+                        }
+                        catch { /* skip unreadable dirs */ }
+                        projects.push({ name: entry.name, noteCount });
+                    }
+                }
+                const indent = trimmedArgs.prettyPrint ? 2 : undefined;
+                return {
+                    content: [
+                        {
+                            type: "text",
+                            text: JSON.stringify({
+                                vaultRoot,
+                                activeProject: projectName,
+                                effectivePath: vaultPath,
+                                projects
+                            }, null, indent)
+                        }
+                    ]
+                };
+            }
+            case "get_current_project": {
+                return {
+                    content: [
+                        {
+                            type: "text",
+                            text: JSON.stringify({
+                                vaultRoot,
+                                activeProject: projectName || "(none - full vault access)",
+                                effectivePath: vaultPath
+                            }, null, 2)
                         }
                     ]
                 };

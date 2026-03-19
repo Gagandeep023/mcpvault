@@ -4,7 +4,8 @@ A lightweight MCP (Model Context Protocol) server for connecting AI assistants t
 
 ## Features
 
-- 14 MCP methods covering all vault operations
+- 16 MCP methods covering all vault operations
+- **Project-level scoping** - isolate notes per project so AI never mixes contexts
 - Full-text search with BM25 relevance reranking
 - Safe frontmatter parsing and validation
 - Read, write, patch, delete, move notes
@@ -65,6 +66,50 @@ npx @gagandeep023/mcpvault@latest /path/to/your/vault
 
 Replace `/path/to/your/vault` with your actual vault path.
 
+## Project Scoping
+
+Organize your vault into project folders and scope the server to one project at a time. This prevents AI from mixing notes across projects.
+
+**Vault structure:**
+```
+my-vault/
+  pulse-central/
+    api-notes.md
+    deployment.md
+  coffee-project/
+    ideas.md
+    architecture.md
+  shared/
+    templates.md
+```
+
+**Scope to a project with `--project`:**
+
+```bash
+# Claude Code - scoped to pulse-central only
+claude mcp add obsidian npx @gagandeep023/mcpvault --project pulse-central /path/to/vault
+
+# Claude Desktop
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "npx",
+      "args": ["@gagandeep023/mcpvault@latest", "--project", "pulse-central", "/path/to/vault"]
+    }
+  }
+}
+
+# Run directly
+npx @gagandeep023/mcpvault@latest --project pulse-central /path/to/vault
+```
+
+When `--project` is set:
+- All read/write/search operations are restricted to that project folder
+- Notes from other projects are invisible
+- Use `list_projects` tool to see available projects
+- Use `get_current_project` tool to check which project is active
+- Omit `--project` for full vault access
+
 ## API Methods
 
 | Method | Description |
@@ -83,14 +128,17 @@ Replace `/path/to/your/vault` with your actual vault path.
 | `get_notes_info` | Get metadata for multiple notes |
 | `get_vault_stats` | Vault-level statistics |
 | `manage_tags` | Add, remove, or list tags |
+| `list_projects` | List available project folders in vault |
+| `get_current_project` | Show active project and effective path |
 
 ## Development
 
 ```bash
 npm install
-npm start /path/to/vault    # Run locally
-npm test                     # Run tests
-npm run build                # Build for distribution
+npm start /path/to/vault                        # Full vault access
+npm start -- --project myproject /path/to/vault  # Scoped to project
+npm test                                         # Run tests
+npm run build                                    # Build for distribution
 ```
 
 ## Prerequisites

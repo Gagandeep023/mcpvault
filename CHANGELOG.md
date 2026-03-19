@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.0] - 2026-03-20
+
+### Added
+
+- Project-level scoping via `--project <name>` CLI flag
+- `list_projects` tool to discover available project folders
+- `get_current_project` tool to show active project and effective path
+- When scoped, all operations are restricted to the project subfolder
+
 ## [0.1.0] - 2026-03-20
 
 ### Initial Release
