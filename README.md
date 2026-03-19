@@ -73,7 +73,10 @@ npm run build                # Build for distribution
 ## Prerequisites
 
 - Node.js v18.0.0 or later
-- An Obsidian vault (or any directory with markdown files)
+- [Obsidian](https://obsidian.md) (free, available on macOS/Windows/Linux)
+- An MCP-compatible AI client (Claude Code, Claude Desktop, ChatGPT Desktop, etc.)
+
+> **Note:** Obsidian is only needed to create and manage your vault. This server works directly with the vault's markdown files on disk, no Obsidian plugins required. Obsidian does not need to be running for the server to work.
 
 ## License
 
