@@ -96,14 +96,19 @@ my-vault/
 
 ```bash
 # Claude Code - scoped to pulse-central only
-claude mcp add obsidian npx @gagandeep023/mcpvault --project pulse-central /path/to/vault
+claude mcp add obsidian npx @gagandeep023/mcpvault \
+  --project pulse-central /path/to/vault
 
 # Claude Desktop
 {
   "mcpServers": {
     "obsidian": {
       "command": "npx",
-      "args": ["@gagandeep023/mcpvault@latest", "--project", "pulse-central", "/path/to/vault"]
+      "args": [
+        "@gagandeep023/mcpvault@latest",
+        "--project", "pulse-central",
+        "/path/to/vault"
+      ]
     }
   }
 }
@@ -147,7 +152,7 @@ npm install
 npm start /path/to/vault                        # Full vault access
 npm start -- --project myproject /path/to/vault  # Scoped to project
 npm test                                         # Run tests
-npm run build                                    # Build for distribution
+npm run build                     # Build for distribution
 ```
 
 ## Prerequisites
@@ -163,8 +168,9 @@ npm run build                                    # Build for distribution
 Want a Claude agent to set up everything for you? Paste this prompt into Claude Code:
 
 ```
-Install @gagandeep023/mcpvault globally, then read the guide and follow it
-step by step to set up the Obsidian vault and MCP server for my projects:
+Install @gagandeep023/mcpvault globally, then read the guide
+and follow it step by step to set up the Obsidian vault and
+MCP server for my projects:
 
 npm install -g @gagandeep023/mcpvault
 cat $(npm root -g)/@gagandeep023/mcpvault/guide.md
